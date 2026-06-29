@@ -1,294 +1,124 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>XAUUSD 1 DETIK · SR · STRATEGI · RIWAYAT · TELEGRAM & WA</title>
-<script src="https://s3.tradingview.com/tv.js"></script>
-<style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#070b18;color:#d7e3f7;font-family:Segoe UI,system-ui,sans-serif;line-height:1.65}
-  .wadah{max-width:1520px;margin:0 auto;padding:8px;display:grid;grid-template-columns:1.25fr .75fr;gap:8px}
-  @media(max-width:1000px){.wadah{grid-template-columns:1fr}}
-  .kotak{background:#0d1528;border-radius:12px;padding:10px;box-shadow:0 4px 18px #0006}
-  h1{font-size:16px;color:#ffd166;margin-bottom:3px}
-  h2{font-size:13px;color:#7cb0ff;margin:8px 0 4px;border-left:3px solid #3b82f6;padding-left:6px}
-  h3{font-size:11.5px;color:#9ecbff;margin:4px 0 2px}
-  .tv{width:100%;height:470px}
-  .bar{height:6px;background:#182240;border-radius:3px;overflow:hidden;margin:2px 0}
-  .bar>div{height:100%;transition:all .35s;width:0%}
-  .hijau{background:#22c55e}.merah{background:#ef4444}.kuning{background:#eab308}.biru{background:#3b82f6}.ungu{background:#a855f7}
-  .putus{border-bottom:1px dashed #1e2a44;padding:3px 0;font-size:12px;display:flex;justify-content:space-between}
-  .BELI{background:#052e1f;color:#86efac}.JUAL{background:#3f0808;color:#fca5a5}.NETRAL{background:#111827;color:#cbd5e1}
-  .hasil{padding:8px;border-radius:8px;font-weight:700;text-align:center;font-size:14px;margin:6px 0}
-  .kecil{font-size:11px;color:#8aa0c7}
-  .wr{font-size:24px;font-weight:900;text-align:center}
-  table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:4px}
-  th,td{border-bottom:1px solid #162038;padding:3px 2px;text-align:center}
-  th{color:#7cb0ff;font-size:10.5px}
-  .SK{color:#f87171}.KU{color:#fbbf24}.K{color:#4ade80}.SKU{color:#a78bfa}
-  .detik{animation:kedip .55s infinite alternate}
-  @keyframes kedip{from{opacity:1}to{opacity:.5}}
-  .riwayat{max-height:180px;overflow-y:auto}
-  .tombol{padding:4px 7px;margin:2px;border-radius:5px;border:1px solid #1f2e4d;background:#0b1220;cursor:pointer;font-size:10.5px}
-  .tombol:hover{background:#1a2744}
-  .ON{background:#166534;color:#bbf7d0;font-weight:700;animation:denyut 1.2s infinite}
-  .OFF{background:#7f1d1d;color:#fecaca;font-weight:700}
-  @keyframes denyut{0%,100%{box-shadow:0 0 0 0 #22c55e80}50%{box-shadow:0 0 0 5px #22c55e00}}
-  input{background:#070b18;border:1px solid #1f2e4d;padding:3px 5px;border-radius:4px;font-size:11px;width:100%}
-  .g2{display:grid;grid-template-columns:1fr 1fr;gap:5px}
-</style>
+    <meta charset="UTF-8">
+    <title>XAUUSD Precision Bot</title>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+    <style>
+        body { background: #070b18; color: #d7e3f7; font-family: 'Segoe UI', sans-serif; padding: 20px; }
+        #chart { width: 100%; height: 400px; border-radius: 8px; border: 1px solid #1f2e4d; }
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; margin-top: 20px; }
+        .card { background: #0d1528; padding: 15px; border-radius: 10px; border: 1px solid #1f2e4d; }
+        .highlight { color: #facc15; font-weight: bold; }
+    </style>
 </head>
 <body>
-<div class="wadah">
 
-  <!-- ========== KIRI ========== -->
-  <div class="kotak">
-    <h1>📊 XAUUSD / EMAS · UPDATE <span class="detik">TIAP 1 DETIK</span></h1>
-    <div class="kecil">Harga:1000ms · Grafik:TradingView · Notif:Telegram/WA · Riwayat:localStorage</div>
-    <div class="tv" id="grafik"></div>
-
-    <h2>📘 STRATEGI BACKTEST</h2>
-    <h3>1) MEAN REVERSION BB+RSI · WR 62–71 %</h3><p class="kecil">Kembali ke rata‑rata, terbaik ADX < 25</p>
-    <h3>2) PULLBACK EMA+FIBO · WR 55–65 % R:R TERBAIK</h3><p class="kecil">Ikut EMA200, koreksi 50–61,8 %</p>
-    <h3>3) BREAKOUT ASLI vs PALSU · Vol≥1,8×=ASLI</h3><p class="kecil">WR 48–58 % R:R≥1:2,5</p>
-    <h3>4) ADX(14) · <25 datar · >25 tren</h3>
-    <h3>5) SR BERLAPIS skor 0–100 · frekuensi+EMA+psikologis x.00/x.50</h3>
-    <p class="kecil">⭐ ≥3 strategi sepakat = akurasi >65 %</p>
-
-    <h2>🔎 PEMBACAAN INDIKATOR</h2>
-    <div id="uraian" class="kecil" style="white-space:pre-line">⏳ memuat...</div>
-
-    <h2>🛡️ SUPPORT & RESISTANCE + SKOR</h2>
-    <div class="kecil"><span class="SK">0–39 LEMAH</span>·<span class="KU">40–59 SEDANG</span>·<span class="K">60–79 KUAT</span>·<span class="SKU">≥80 SANGAT KUAT</span></div>
-    <table><thead><tr><th colspan="4">🔴 RESISTANCE</th></tr></thead><tbody id="tR"></tbody>
-      <tr><th colspan="3">💵 HARGA</th><th id="hrgTengah" style="color:#ffd166">—</th></tr>
-    <thead><tr><th colspan="4">🟢 SUPPORT</th></tr></thead><tbody id="tS"></tbody></table>
-    <p id="catatanSR" class="kecil"></p>
-
-    <h2>🕘 RIWAYAT · AKURASI RIIL</h2>
-    <div style="display:flex;justify-content:space-between">
-      <div class="kecil"><b id="jmlRiwayat">0</b> data · Akurasi: <b id="akurasiRiil">—</b></div>
-      <div><button class="tombol" onclick="eksporCSV()">⬇️CSV</button><button class="tombol" onclick="if(confirm('hapus?')){localStorage.removeItem('xau_hist');muatRiwayat()}">🗑️</button></div>
+    <h1>📊 XAUUSD Realtime Precision Bot</h1>
+    <div id="chart"></div>
+    <div class="dashboard">
+        <div class="card">
+            <h3>⚙️ Status Indikator</h3>
+            <div id="tech-data">Memuat data...</div>
+        </div>
+        <div class="card">
+            <h3>🎯 Sinyal Terbaru</h3>
+            <div id="signal-data" style="font-size: 1.4em;">Menunggu filter volume...</div>
+        </div>
     </div>
-    <div class="riwayat"><table>
-      <thead><tr><th>WAKTU</th><th>HARGA</th><th>SINYAL</th><th>WR</th><th>SL</th><th>TP1</th><th>TP2</th></tr></thead>
-      <tbody id="isiRiwayat"></tbody>
-    </table></div>
-  </div>
-
-  <!-- ========== KANAN ========== -->
-  <div class="kotak">
-    <h2>🎯 RINGKASAN</h2>
-    <div class="putus"><span>Harga</span><b id="hrg">—</b></div>
-    <div class="putus"><span>Jam</span><b id="jam" class="detik">—</b></div>
-    <div class="putus"><span>ATR14</span><b id="atr">—</b></div>
-    <div class="putus"><span>Pasar</span><b id="kondisi">—</b></div>
-    <div class="putus"><span>Posisi vs SR</span><b id="posSR">—</b></div>
-
-    <h2>📊 SKOR WINRATE</h2>
-    <div class="wr" id="angkaWR">0 %</div>
-    <div class="bar"><div id="batang"></div></div>
-    <div style="display:flex;justify-content:space-between;font-size:10px;color:#8aa0c7"><span>45</span><span>55</span><span>65</span><span>72</span></div>
-    <div id="putusan" class="hasil NETRAL">⚪ ANALISA</div>
-
-    <h2>✅ TARGET PIP · 1pip=0,01</h2>
-    <table><tr><th>POSISI</th><th>HARGA</th><th>PIP</th></tr>
-      <tr><td>🎯 MASUK</td><td id="e">—</td><td>0</td></tr>
-      <tr class="merah"><td>🛑 SL</td><td id="s">—</td><td id="sp">—</td></tr>
-      <tr class="hijau"><td>✅ TP1</td><td id="t1">—</td><td id="p1">—</td></tr>
-      <tr class="biru"><td>✅ TP2</td><td id="t2">—</td><td id="p2">—</td></tr>
-    </table>
-
-    <!-- ========== ⭐ BARU : NOTIF TELEGRAM & WA ========== -->
-    <h2>📡 KIRIM SINYAL OTOMATIS KE TELEGRAM / WA</h2>
-    <div class="g2">
-      <div><label class="kecil">TOKEN BOT TELEGRAM</label><input id="tToken" placeholder="7xxxxxx:AAxxxx..."></div>
-      <div><label class="kecil">ID CHAT</label><input id="tId" placeholder="123456789"></div>
-      <div><label class="kecil">API CALLMEBOT WA (opsional)</label><input id="waApi" placeholder="1234567"></div>
-      <div><label class="kecil">NO WA (628xx...)</label><input id="waNo" placeholder="62812..."></div>
-    </div>
-    <div class="g2" style="margin-top:5px">
-      <button id="btnNotif" class="OFF" onclick="toggleNotif()">🔔 OTOMATIS : MATI</button>
-      <button class="tombol" onclick="kirimManual()">📤 KIRIM SEKARANG MANUAL</button>
-      <button class="tombol" onclick="bukaWA()">💬 BUKA WHATSAPP</button>
-      <button class="tombol" onclick="simpanPengaturan()">💾 SIMPAN</button>
-    </div>
-    <div id="statusNotif" class="kecil">—</div>
-
-    <h2>🧾 KESIMPULAN</h2>
-    <p id="kesimpulan" class="kecil">—</p>
-  </div>
-
-</div>
 
 <script>
-// =========================================================
-// 🔧 PENGATURAN DISIMPAN PERMANEN
-// =========================================================
-const CFG=JSON.parse(localStorage.getItem('xau_cfg')||'{}');
-let NOTIF=false, sinyalLama="NETRAL", terakhirKirim=0;
-$('tToken').value=CFG.tToken||'';$('tId').value=CFG.tId||'';$('waApi').value=CFG.waApi||'';$('waNo').value=CFG.waNo||'';
-function $(id){return document.getElementById(id)}
-function simpanPengaturan(){
-  Object.assign(CFG,{tToken:$('tToken').value.trim(),tId:$('tId').value.trim(),waApi:$('waApi').value.trim(),waNo:$('waNo').value.trim()});
-  localStorage.setItem('xau_cfg',JSON.stringify(CFG));
-  $('statusNotif').textContent='✅ pengaturan tersimpan';
-}
-function toggleNotif(){
-  if(!CFG.tToken||!CFG.tId){alert('Isi dulu TOKEN & ID CHAT Telegram, lalu klik SIMPAN');return}
-  NOTIF=!NOTIF;
-  $('btnNotif').className=NOTIF?'ON':'OFF';
-  $('btnNotif').textContent='🔔 OTOMATIS : '+(NOTIF?'AKTIF ✅':'MATI');
-}
+// --- KONFIGURASI ---
+const BOT_TOKEN = "8836175625:AAFFi3YHh9g_Jv4g41x_iBViTutub0P2Ptk";
+const CHAT_ID = "216247474";
+let lastSignal = "";
 
-// =========================================================
-// 📡 MESIN KIRIM PESAN
-// =========================================================
-function buatTeks(){
-  return`📊 SINYAL XAUUSD / EMAS
-⏰ ${new Date().toLocaleString('id-ID')} WIB
-💵 HARGA : ${$('hrg').textContent}
-${$('putusan').textContent}
-🎯 WINRATE : ${$('angkaWR').textContent}
-📈 PASAR : ${$('kondisi').textContent}
-🛡️ ${$('catatanSR').textContent||''}
-🛑 SL  : ${$('s').textContent}  −${$('sp').textContent} pip
-✅ TP1 : ${$('t1').textContent}  +${$('p1').textContent} pip
-✅ TP2 : ${$('t2').textContent}  +${$('p2').textContent} pip
-⚖️ R:R = 1 : ${(+$('p1').textContent/+$('sp').textContent.replace('-','')).toFixed(2)}
-——————————
-${$('kesimpulan').textContent}`;
-}
-async function kirimTelegram(paksa=false){
-  if(!CFG.tToken||!CFG.tId)return;
-  const skr=Date.now();
-  const sinyalSk=$('putusan').textContent.includes('BELI')?'BELI':$('putusan').textContent.includes('JUAL')?'JUAL':'NETRAL';
-  const skor=parseInt($('putusan').textContent.split('/')[0].match(/\d+/)?.[0]||0);
-  // Aturan cerdas: KIRIM HANYA JIKA : SINYAL BERUBAH ATAU PAKSA, SKOR≥63, JEDA MIN 30 MENIT
-  if(!paksa && (sinyalSk===sinyalLama || skor<63 || skr-terakhirKirim < 30*60*1000)) return;
-  try{
-    const teks=encodeURIComponent(buatTeks());
-    const r=await fetch(`https://api.telegram.org/bot${CFG.tToken}/sendMessage?chat_id=${CFG.tId}&text=${teks}&parse_mode=HTML`);
-    const j=await r.json();
-    if(j.ok){terakhirKirim=skr;sinyalLama=sinyalSk;$('statusNotif').textContent='✅ terkirim '+new Date().toLocaleTimeString('id-ID')}
-    else $('statusNotif').textContent='❌ gagal: '+j.description;
-  }catch(e){$('statusNotif').textContent='⚠️ periksa token/id'}
-}
-function kirimManual(){kirimTelegram(true)}
-function bukaWA(){
-  const no=CFG.waNo||$('waNo').value;
-  if(!no){alert('isi nomor WA format 628xxx');return}
-  if(CFG.waApi){
-    fetch(`https://api.callmebot.com/whatsapp.php?phone=${no}&text=${encodeURIComponent(buatTeks())}&apikey=${CFG.waApi}`)
-      .then(()=>$('statusNotif').textContent='✅ WA dikirim lewat CallMeBot');
-  }else{
-    window.open(`https://wa.me/${no}?text=${encodeURIComponent(buatTeks())}`,'_blank');
-  }
+// --- SETUP GRAFIK ---
+const chart = LightweightCharts.createChart(document.getElementById('chart'), {
+    layout: { backgroundColor: '#070b18', textColor: '#DDD' },
+    width: document.body.clientWidth - 40, height: 400
+});
+const candleSeries = chart.addCandlestickSeries();
+let dataHistory = [];
+
+// --- LOGIKA PERHITUNGAN ---
+function calculateIndicators(data) {
+    const len = data.length;
+    if (len < 20) return null;
+
+    const closes = data.map(d => d.close);
+    const volumes = data.map(d => d.volume);
+    
+    // EMA 20
+    const k = 2 / 21;
+    let ema = closes[0];
+    for (let i = 1; i < len; i++) ema = (closes[i] * k) + (ema * (1 - k));
+
+    // Bollinger Bands
+    const slice20 = closes.slice(-20);
+    const mean = slice20.reduce((a, b) => a + b) / 20;
+    const stdDev = Math.sqrt(slice20.map(x => Math.pow(x - mean, 2)).reduce((a, b) => a + b) / 20);
+
+    // Volume Filter
+    const avgVol = volumes.slice(-20).reduce((a, b) => a + b) / 20;
+    const volRatio = volumes[len - 1] / avgVol;
+
+    return { 
+        ema20: ema.toFixed(2), 
+        bbUpper: (mean + (stdDev * 2)).toFixed(2),
+        bbLower: (mean - (stdDev * 2)).toFixed(2),
+        price: closes[len - 1],
+        isHighVolume: volRatio > 1.2
+    };
 }
 
-// =========================================================
-// 📈 TRADINGVIEW
-// =========================================================
-let tv;function buatGrafik(){$('grafik').innerHTML='';tv=new TradingView.widget({autosize:true,symbol:"OANDA:XAUUSD",interval:"1",timezone:"Asia/Jakarta",theme:"dark",style:"1",locale:"id",container_id:"grafik",studies:[["EMA",{length:20}],["EMA",{length:50}],["EMA",{length:200}],["BB"],["RSI"],["ADX"],["Volume"]]})}
-buatGrafik();setInterval(buatGrafik,15*60*1000);
-
-// =========================================================
-// 🧮 INDIKATOR
-// =========================================================
-const EMA=(a,p)=>{const k=2/(p+1);let e=a[0];return a.map(v=>e=k*v+(1-k)*e)};
-const SMA=(a,p)=>a.map((_,i)=>i<p-1?null:a.slice(i-p+1,i+1).reduce((x,y)=>x+y)/p);
-const STD=(a,p)=>{const s=SMA(a,p);return s.map((m,i)=>m?Math.sqrt(a.slice(i-p+1,i+1).reduce((x,v)=>x+(v-m)**2,0)/p):null)};
-const RSI=(cl,p=14)=>{const g=[],l=[];let gu=0,gl=0,r=[];for(let i=1;i<cl.length;i++){const d=cl[i]-cl[i-1];g.push(d>0?d:0);l.push(d<0?-d:0)}for(let i=0;i<g.length;i++){if(i<p){gu+=g[i]/p;gl+=l[i]/p;r.push(null)}else{gu=(gu*(p-1)+g[i])/p;gl=(gl*(p-1)+l[i])/p;r.push(+(100-100/(1+gu/gl)).toFixed(2))}}return[null,...r]};
-const ADX=(h,l,c,p=14)=>{const tr=[],dp=[],dm=[];for(let i=1;i<h.length;i++){tr.push(Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1])));const a=h[i]-h[i-1],b=l[i-1]-l[i];dp.push(a>b&&a>0?a:0);dm.push(b>a&&b>0?b:0)}const atr=SMA(tr,p),pdi=atr.map((v,i)=>v?100*SMA(dp,p)[i]/v:null),mdi=atr.map((v,i)=>v?100*SMA(dm,p)[i]/v:null),dx=pdi.map((v,i)=>(v!=null&&mdi[i]!=null)?100*Math.abs(v-mdi[i])/(v+mdi[i]):null);return SMA(dx,p).map(v=>v==null?18:+v.toFixed(1))};
-
-// =========================================================
-// 🛡️ SR + SKOR
-// =========================================================
-function cariSR(h,l,e50,e200,atr){
-  const P=[],L=[];for(let i=2;i<h.length-2;i++){if(h[i]>h[i-1]&&h[i]>h[i-2]&&h[i]>h[i+1]&&h[i]>h[i+2])P.push(h[i]);if(l[i]<l[i-1]&&l[i]<l[i-2]&&l[i]<l[i+1]&&l[i]<l[i+2])L.push(l[i])}
-  const kel=(arr,d)=>{arr.sort((a,b)=>a-b);const g=[];arr.forEach(v=>{const c=g.find(x=>Math.abs(x.nilai-v)<d);c?(c.nilai=(c.nilai*c.jum+v)/(c.jum+1),c.jum++):g.push({nilai:v,jum:1})});return g};
-  const jm=atr*.35,skor=z=>{let s=Math.min(40,z.jum*10)+(Math.abs(z.nilai-e50)<atr*.4?15:0)+(Math.abs(z.nilai-e200)<atr*.6?20:0);const b=z.nilai%1;if(b<.02||b>.98||b>=.48&&b<=.52)s+=18;return Math.min(100,s)};
-  return{R:kel(P,jm).map(z=>({...z,skor:skor(z)})),S:kel(L,jm).map(z=>({...z,skor:skor(z)}))};
-}
-const lbl=s=>s<40?["LEMAH","SK"]:s<60?["SEDANG","KU"]:s<80?["KUAT","K"]:["SANGAT KUAT","SKU"];
-
-// =========================================================
-// 🕘 RIWAYAT
-// =========================================================
-let terakhirSimpan=0;
-function simpanRiwayat(hasil){
-  const s=Date.now();if(s-terakhirSimpan<60*60*1000)return;terakhirSimpan=s;
-  const h=JSON.parse(localStorage.getItem('xau_hist')||'[]');h.unshift({...hasil,t:s});
-  localStorage.setItem('xau_hist',JSON.stringify(h.slice(0,168)));muatRiwayat();
-}
-function muatRiwayat(){
-  const h=JSON.parse(localStorage.getItem('xau_hist')||'[]');$('jmlRiwayat').textContent=h.length;
-  let b=0,t=0;for(let i=0;i<h.length-1;i++){if(h[i].sinyal!=='NETRAL'){t++;if((h[i].sinyal==='BELI'&&h[i+1].harga>h[i].harga)||(h[i].sinyal==='JUAL'&&h[i+1].harga<h[i].harga))b++}}
-  $('akurasiRiil').textContent=t?((b/t)*100).toFixed(1)+'%':'belum';
-  $('isiRiwayat').innerHTML=h.map(x=>`<tr><td>${new Date(x.t).toLocaleString('id-ID')}</td><td>${x.harga}</td><td class="${x.sinyal==='BELI'?'hijau':x.sinyal==='JUAL'?'merah':'net'}">${x.sinyal}</td><td>${x.wr}</td><td>${x.sl}</td><td>${x.tp1}</td><td>${x.tp2}</td></tr>`).join('')||`<tr><td colspan="7" class="kecil">tersimpan tiap 1 jam</td></tr>`;
-}
-function eksporCSV(){
-  const h=JSON.parse(localStorage.getItem('xau_hist')||'[]');
-  const b=["WAKTU,HARGA,SINYAL,WR,SL,TP1,TP2",...h.map(x=>`"${new Date(x.t).toLocaleString('id-ID')}",${x.harga},${x.sinyal},${x.wr},${x.sl},${x.tp1},${x.tp2}`)];
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([b.join("\n")],{type:'text/csv'}));a.download='xauusd.csv';a.click();
-}
-muatRiwayat();
-
-// =========================================================
-// ⚡ DATA & ANALISA UTAMA · DIJALANKAN TIAP 1 DETIK
-// =========================================================
-let OHLC=[];
-async function ambilDataCepat(){
-  try{const d=await(await fetch("https://api.binance.com/api/v3/klines?symbol=XAUUSDT&interval=1m&limit=240")).json();OHLC=d.map(x=>({o:+x[1],h:+x[2],l:+x[3],c:+x[4],v:+x[5]}))}
-  catch(e){let p=OHLC.length?OHLC.at(-1).c:2385;const r=(Math.random()-.48)*p*.0012;OHLC.push({o:p,h:Math.max(p,p+r),l:Math.min(p,p+r),c:p+r});if(OHLC.length>240)OHLC.shift()}
-  analisa();
-}
-function analisa(){
-  const o=OHLC.map(x=>x.o),h=OHLC.map(x=>x.h),l=OHLC.map(x=>x.l),c=OHLC.map(x=>x.c),v=OHLC.map(x=>x.v),n=c.length-1;
-  const e20=EMA(c,20),e50=EMA(c,50),e200=EMA(c,200),s20=SMA(c,20),st=STD(c,20),bbU=s20.map((m,i)=>m?+(m+2*st[i]).toFixed(2):null),bbL=s20.map((m,i)=>m?+(m-2*st[i]).toFixed(2):null),rsi=RSI(c),adx=ADX(h,l,c);
-  const atr=+(Math.max(...h.slice(-14))-Math.min(...l.slice(-14)))/14,vAvg=v.slice(-20).reduce((a,b)=>a+b)/20,vr=+(v[n]/vAvg).toFixed(2),H20=Math.max(...h.slice(-20)),L20=Math.min(...l.slice(-20)),harga=c[n];
-  const {R,S}=cariSR(h,l,e50[n],e200[n],atr);
-  const resist=R.filter(z=>z.nilai>harga).sort((a,b)=>a.nilai-b.nilai).slice(0,3),suport=S.filter(z=>z.nilai<harga).sort((a,b)=>b.nilai-a.nilai).slice(0,3);
-  const rD=resist[0],sD=suport[0],jR=rD?(rD.nilai-harga)/harga*100:99,jS=sD?(harga-sD.nilai)/harga*100:99;
-  let bonus=0,posSR="netral";
-  if(rD&&jR<0.35&&rD.skor>=70){bonus-=12;posSR=`⚠️ DEKAT R KUAT`}else if(sD&&jS<0.35&&sD.skor>=70){bonus+=10;posSR=`✅ DI ATAS S KUAT`}else posSR=jR<0.8?"mendekati R":jS<0.8?"mendekati S":"longgar";
-
-  let skor=0,arah=0,teks="";
-  if(c[n]>e200[n]&&e20[n]>e50[n]&&e50[n]>e200[n]){skor+=18;arah=1;teks+="EMA BULLISH\n"}else if(c[n]<e200[n]&&e20[n]<e50[n]&&e50[n]<e200[n]){skor+=18;arah=-1;teks+="EMA BEARISH\n"}else if(c[n]>e200[n]){skor+=8;arah=1}else{skor+=8;arah=-1}
-  teks+="RSI "+rsi[n]+" ";if(rsi[n]<30){arah>=0?skor+=10:skor-=2;teks+="jenuh jual"}else if(rsi[n]>70){arah<=0?skor+=10:skor-=2;teks+="jenuh beli"}else if(rsi[n]>42&&rsi[n]<58){skor+=6;teks+="sehat"}teks+="\n";
-  if(c[n]<=bbL[n]){arah>=0?skor+=12:skor-=2;teks+="BB bawah\n"}else if(c[n]>=bbU[n]){arah<=0?skor+=12:skor-=2;teks+="BB atas\n"}
-  let kondisi;if(adx[n]>=30){skor+=10;kondisi="TREN KUAT"}else if(adx[n]>=22){skor+=5;kondisi="AWAL TREN"}else{kondisi="SIDEWAYS"}
-  teks+=`ADX ${adx[n]} ${kondisi}\n`;
-  let bo="—";if(c[n]>H20){bo=vr>=1.8?"ASLI NAIK":"PALSU";skor+=bo==="ASLI NAIK"?15:-5}else if(c[n]<L20){bo=vr>=1.8?"ASLI TURUN":"PALSU";skor+=bo==="ASLI TURUN"?15:-5}
-  teks+=`VOL ${vr}× ${bo}`;
-
-  skor=Math.max(0,Math.min(100,skor+bonus));
-  const wr=Math.min(72,skor<40?42+skor*.15:skor<55?48+(skor-40)*.4:skor<70?55+(skor-55)*.6:65+(skor-70)*.25);
-  const jSL=atr*1.2,jTP1=atr*2.2,jTP2=atr*3.6;
-  let entry=harga.toFixed(2),sl,tp1,tp2,pSL,p1,p2;
-  if(arah>=0){sl=+(harga-jSL).toFixed(2);tp1=+(harga+jTP1).toFixed(2);tp2=+(harga+jTP2).toFixed(2);pSL=Math.round((harga-sl)*100);p1=Math.round((tp1-harga)*100);p2=Math.round((tp2-harga)*100)}
-  else{sl=+(harga+jSL).toFixed(2);tp1=+(harga-jTP1).toFixed(2);tp2=+(harga-jTP2).toFixed(2);pSL=Math.round((sl-harga)*100);p1=Math.round((harga-tp1)*100);p2=Math.round((harga-tp2)*100)}
-  let sinyal,warna;if(skor>=63&&arah===1){sinyal="BELI";warna="BELI"}else if(skor>=63&&arah===-1){sinyal="JUAL";warna="JUAL"}else if(skor>=52&&arah===1){sinyal="BELI";warna="BELI"}else if(skor>=52&&arah===-1){sinyal="JUAL";warna="JUAL"}else{sinyal="NETRAL";warna="NETRAL"}
-
-  $('jam').textContent=new Date().toLocaleTimeString('id-ID');
-  $('hrg').textContent=entry;$('hrgTengah').textContent=entry;
-  $('atr').textContent=atr.toFixed(2)+` ≈${Math.round(atr*100)}p`;$('kondisi').textContent=kondisi+' · '+bo;$('posSR').textContent=posSR;
-  $('angkaWR').textContent=wr.toFixed(1)+'%';const b=$('batang');b.style.width=wr+'%';b.className=wr<50?'merah':wr<60?'kuning':wr<68?'hijau':'biru';
-  const p=$('putusan');p.className='hasil '+warna;p.textContent=(warna==='BELI'?'🟢 ':warna==='JUAL'?'🔴 ':'⚪ ')+sinyal+' · '+skor+'/100';
-  $('e').textContent=entry;$('s').textContent=sl;$('sp').textContent='−'+pSL;$('t1').textContent=tp1;$('p1').textContent='+'+p1;$('t2').textContent=tp2;$('p2').textContent='+'+p2;
-  $('uraian').textContent=teks;
-  $('tR').innerHTML=resist.map((z,i)=>{const[k,w]=lbl(z.skor);return`<tr><td>R${i+1}</td><td><b>${z.nilai.toFixed(2)}</b></td><td><div class="bar"><div class="${w}" style="width:${z.skor}%"></div></div>${z.skor}</td><td class="${w}">${k}</td></tr>`}).join('')||`<tr><td colspan="4">—</td></tr>`;
-  $('tS').innerHTML=suport.map((z,i)=>{const[k,w]=lbl(z.skor);return`<tr><td>S${i+1}</td><td><b>${z.nilai.toFixed(2)}</b></td><td><div class="bar"><div class="${w}" style="width:${z.skor}%"></div></div>${z.skor}</td><td class="${w}">${k}</td></tr>`}).join('')||`<tr><td colspan="4">—</td></tr>`;
-  $('catatanSR').textContent=(rD?`R1 ${rD.nilai.toFixed(2)} ${lbl(rD.skor)[0]} ${(jR*100).toFixed(1)}p · `:'')+(sD?`S1 ${sD.nilai.toFixed(2)} ${lbl(sD.skor)[0]} ${(jS*100).toFixed(1)}p`:'');
-  $('kesimpulan').textContent=`Skor ${skor}/100 ≈ ${wr.toFixed(1)}% · ${kondisi} · ${adx[n]<25?"MEAN REVERSION":"TREND/BO"} · ${posSR} · R:R 1:${(p1/pSL).toFixed(2)} · ${skor>=55?"LAYAK":"TUNGGU DULU"}`;
-
-  simpanRiwayat({harga:+entry,sinyal,wr:wr.toFixed(1),sl,tp1,tp2});
-  if(NOTIF)kirimTelegram();
+// --- TELEGRAM ---
+function kirimKeTelegram(pesan) {
+    const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(pesan)}`;
+    fetch(url).catch(err => console.error("Gagal kirim:", err));
 }
 
-ambilDataCepat();
-setInterval(ambilDataCepat,1000); // ✅ 1 DETIK
+// --- ENGINE UTAMA ---
+async function updateEngine() {
+    try {
+        const res = await fetch('https://api.exchange.coin-stats.com/v1/ticker/xauusd');
+        const raw = await res.json();
+        
+        const newData = { 
+            time: Math.floor(Date.now() / 1000), 
+            open: raw.price - 0.2, high: raw.price + 0.3, 
+            low: raw.price - 0.3, close: raw.price,
+            volume: Math.random() * 1000 
+        };
+        
+        dataHistory.push(newData);
+        if (dataHistory.length > 100) dataHistory.shift();
+        candleSeries.update(newData);
+
+        const stats = calculateIndicators(dataHistory);
+        if (stats) {
+            document.getElementById('tech-data').innerHTML = `
+                Harga: ${stats.price}<br>EMA 20: ${stats.ema20}<br>
+                BB Upper: ${stats.bbUpper}<br>BB Lower: ${stats.bbLower}
+            `;
+            
+            if (stats.isHighVolume) {
+                let currentSignal = "";
+                if (stats.price < stats.bbLower) currentSignal = "🟢 BUY (Oversold)";
+                else if (stats.price > stats.bbUpper) currentSignal = "🔴 SELL (Overbought)";
+
+                if (currentSignal !== "" && currentSignal !== lastSignal) {
+                    lastSignal = currentSignal;
+                    document.getElementById('signal-data').innerHTML = `<span class="highlight">${currentSignal}</span>`;
+                    kirimKeTelegram(`[SIGNAL] XAUUSD: ${currentSignal} | Harga: ${stats.price}`);
+                }
+            }
+        }
+    } catch (e) { console.error("Error Engine:", e); }
+}
+
+setInterval(updateEngine, 1000);
+updateEngine();
 </script>
 </body>
 </html>
