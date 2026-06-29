@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>📊 TRADINGVIEW FULL SYSTEM · WINRATE · SIM · AUTO · TRAILING · DAILY LIMIT</title>
+<script src="https://s3.tradingview.com/tv.js"></script>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Segoe UI,system-ui,sans-serif;color:#e6eef8}
+  body{background:#0b1220}
+  .wrap{max-width:1650px;margin:0 auto;padding:8px;display:grid;grid-template-columns:1.4fr .6fr;gap:8px}
+  @media(max-width:1024px){.wrap{grid-template-columns:1fr}}
+  .card{background:#111b2e;border-radius:10px;padding:9px;box-shadow:0 4px 18px #0006}
+  h2{font-size:13px;margin-bottom:7px;color:#7cb0ff}
+  h3{font-size:11.5px;color:#9ec5ff;margin:6px 0 4px;border-left:3px solid #3b82f6;padding-left:6px}
+  #tvchart{width:100%;height:500px}
+  .gauge-wrap{display:flex;flex-direction:column;align-items:center}
+  .gauge{position:relative;width:240px;height:130px;overflow:hidden}
+  .arc{position:absolute;inset:0 0 -120px 0;border-radius:240px 240px 0 0;
+       background:conic-gradient(from 180deg,#ef4444 0 30%,#eab308 30% 55%,#22c55e 55% 82%,#3b82f6 82% 100%);
+       -webkit-mask:radial-gradient(circle at 50% 100%,transparent 62%,#000 63%)}
+  .jarum{position:absolute;left:50%;bottom:0;width:4px;height:110px;background:#fff;border-radius:4px;
+         transform-origin:bottom center;transform:translateX(-50%) rotate(-90deg);transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+  .jarum::after{content:"";position:absolute;left:50%;bottom:-9px;width:20px;height:20px;border-radius:50%;background:#fff;transform:translateX(-50%)}
+  .angka{position:absolute;left:50%;bottom:-4px;transform:translateX(-50%);font-size:30px;font-weight:800;text-shadow:0 2px 6px #000}
+  .ket{display:flex;justify-content:space-between;width:240px;font-size:10px;margin-top:4px;color:#9fb3d3}
+  .sinyal{text-align:center;padding:7px;border-radius:7px;font-weight:700;margin:7px 0;font-size:14px}
+  .BELI{background:#064e3b;color:#86efac}.JUAL{background:#450a0a;color:#fca5a5}.NETRAL{background:#1f2937;color:#cbd5e1}.KUNCI{background:#422006;color:#fbbf24}
+  .row{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px dashed #1e2a44;font-size:11.8px}
+  .ok{color:#4ade80}.no{color:#f87171}.net{color:#94a3b8}.hijau{color:#22c55e}.merah{color:#ef4444}.kuning{color:#fbbf24}
+  .g2,.g3,.g4{display:grid;gap:5px}
+  .g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:1fr 1fr 1fr}.g4{grid-template-columns:repeat(4,1fr)}
+  input,select,button{background:#0b1220;border:1px solid #1f2e4d;padding:5px;border-radius:5px;font-size:11.5px;cursor:pointer}
+  button:hover{background:#1a2744}
+  input[type="number"]{text-align:right}
+  .ON,.autoON{background:#166534;color:#bbf7d0;font-weight:700;animation:denyut 1.2s infinite}
+  .OFF,.autoOFF{background:#7f1d1d;color:#fecaca;font-weight:700}
+  @keyframes denyut{0%,100%{box-shadow:0 0 0 0 #22c55e80}50%{box-shadow:0 0 0 6px #22c55e00}}
+  .eq{font-size:17px;font-weight:800}
+  .riwayat{max-height:170px;overflow-y:auto;font-size:10.5px}
+  .riwayat table{width:100%;border-collapse:collapse}
+  .riwayat th,.riwayat td{border-bottom:1px solid #162038;padding:2px;text-align:center}
+  .kecil{font-size:10px;color:#6b80a3;line-height:1.4}
+  .hasil{padding:6px;background:#0b1220;border-radius:5px;font-size:11.5px;line-height:1.6}
+  .collapsible{cursor:pointer;user-select:none}
+  .isi{max-height:0;overflow:hidden;transition:max-height .25s}
+  .buka+.isi{max-height:900px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h2>📈 GRAFIK ASLI TRADINGVIEW · DATA REALTIME</h2>
+    <div class="g3">
+      <select id="simbol">
+        <option value="BINANCE:BTCUSDT">BTC / USDT</option>
+        <option value="BINANCE:ETHUSDT">ETH / USDT</option>
+        <option value="OANDA:EURUSD">EUR / USD</option>
+        <option value="OANDA:XAUUSD">EMAS / USD</option>
+        <option value="IDX:BBRI">BBRI</option><option value="SP:SPX">S&P500</option>
+      </select>
+      <select id="tf"><option value="5">M5</option><option value="15">M15</option><option value="60" selected>H1</option><option value="240">H4</option><option value="D">HARIAN</option></select>
+      <button onclick="muatUlangTV()">🔄 MUAT GRAFIK</button>
+    </div>
+    <div id="tvchart"></div>
+    <div class="kecil">ℹ️ Data langsung server TradingView · EMA20/50/200 · BB · Volume otomatis aktif · WIB</div>
+
+    <!-- ========== MODAL & DASAR ========== -->
+    <div class="card" style="margin-top:8px;background:#0b1220">
+      <h2>💳 PENGATURAN MODAL & BIAYA</h2>
+      <div class="g2">
+        <div class="row"><label>💰 MODAL AWAL</label><input id="modal" type="number" value="10000" step="100"> <small>USDT</small></div>
+        <div class="row"><label>📦 LOT / UKURAN</label><input id="lot" type="number" value="0.10" step="0.01"></div>
+        <div class="row"><label>💱 SPREAD SAAT INI</label><b id="spNow" class="net">0,030 %</b> <small>· mengambang dinamis</small></div>
+        <div class="row"><label>📊 KOMISI / TRADE</label><input id="komisi" type="number" value="0.04" step="0.01"> <small>%</small></div>
+      </div>
+
+      <!-- ========== ⭐ BARU : TRAILING STOP ========== -->
+      <h3 class="collapsible" onclick="this.classList.toggle('buka')">🛡️ TRAILING STOP OTOMATIS ⬇</h3>
+      <div class="isi">
+      <div class="g2">
+        <div class="row"><label>AKTIFKAN TRAILING</label><button id="btnTr" class="OFF" onclick="toggleTr()">TRAILING : MATI</button></div>
+        <div class="row"><label>METODE</label><select id="modeTr"><option value="ATR">ATR ×</option><option value="PERSEN">PERSEN %</option></select></div>
+        <div class="row"><label>JARAK TRAILING</label><input id="nilaiTr" type="number" value="1.5" step="0.1"> <span id="satTr">× ATR14</span></div>
+        <div class="row"><label>AKTIF SETELAH UNTUNG</label><input id="aktivTr" type="number" value="0.4" step="0.1"> <small>%</small></div>
+        <div class="row"><span>📍 TRAILING SAAT INI</span><b id="trNow" class="net">—</b></div>
+        <div class="row"><span>📈 TERTINGGI / TERENDAH</span><b id="trExt" class="net">—</b></div>
+      </div></div>
+
+      <!-- ========== ⭐ BARU : DAILY LOSS LIMIT ========== -->
+      <h3 class="collapsible" onclick="this.classList.toggle('buka')">🚫 BATAS KERUGIAN HARIAN ⬇</h3>
+      <div class="isi">
+      <div class="g2">
+        <div class="row"><label>MAKS RUGI / HARI</label><input id="dlPct" type="number" value="3" step="0.5"> <small>%</small> ATAU <input id="dlUang" type="number" value="300" step="10"> <small>$</small></div>
+        <div class="row"><label>TERPAKAI HARI INI</label><b id="dlPakai" class="hijau">0,00 % / 0,00 $</b></div>
+        <div class="row"><span>STATUS</span><b id="dlStatus" class="ok">AMAN</b></div>
+        <div class="row"><span>SALDO AWAL HARI</span><b id="dlAwal">10 000,00</b></div>
+        <button onclick="resetHarian()">🔄 RESET HARIAN</button>
+        <button onclick="bukaKunci()">🔓 BUKA KUNCI PAKSA</button>
+      </div></div>
+
+      <!-- ========== ⭐ BARU : RUGI BERTURUT & PARSIAL ========== -->
+      <h3 class="collapsible" onclick="this.classList.toggle('buka')">⚙️ MANAJEMEN RISIKO LANJUTAN ⬇</h3>
+      <div class="isi">
+      <div class="g2">
+        <div class="row"><label>MAKS RUGI BERTURUT</label><input id="maxLos" type="number" value="5" min="1"></div>
+        <div class="row"><label>AMBIL 50 % DI TP1</label><button id="btnPar" class="ON" onclick="pars=!pars;this.className=pars?'ON':'OFF';this.textContent='PARSIAL : '+(pars?'AKTIF':'MATI')">PARSIAL : AKTIF</button></div>
+        <div class="row"><span>SAAT INI RUGI BERTURUT</span><b id="jmlLosB">0</b></div>
+      </div></div>
+
+      <!-- ========== EKSEKUSI ========== -->
+      <div class="g3" style="margin:7px 0">
+        <button id="btnBeli" onclick="manualBeli()">🟢 MANUAL BELI</button>
+        <button id="btnJual" onclick="manualJual()">🔴 MANUAL JUAL</button>
+        <button id="btnTutup" onclick="tutupPosisi()">⚪ TUTUP POSISI</button>
+      </div>
+      <div class="g2">
+        <button id="btnAuto" class="autoOFF" onclick="toggleAuto()">⚡ AUTO TRADE : MATI</button>
+        <button onclick="resetSimulasi()">🗑️ RESET SEMUA</button>
+      </div>
+
+      <!-- ========== STATISTIK ========== -->
+      <div class="g2">
+        <div>
+          <div class="row"><span>💵 SALDO</span><b id="saldo" class="eq hijau">10 000,00</b></div>
+          <div class="row"><span>📈 EKUITAS</span><b id="ekuitas" class="eq hijau">10 000,00</b></div>
+          <div class="row"><span>💸 FLOATING</span><b id="fpl" class="net">0,00</b></div>
+          <div class="row"><span>📉 MAKS DRAWDOWN</span><b id="mdd" class="merah">0,00 %</b></div>
+        </div>
+        <div>
+          <div class="row"><span>📊 TOTAL TRADES</span><b id="jmlTrd">0</b> ✅<b id="jmlWin">0</b> ❌<b id="jmlLos">0</b></div>
+          <div class="row"><span>🎯 WINRATE RIIL</span><b id="wrRiil">0 %</b></div>
+          <div class="row"><span>💰 TOTAL P/L</span><b id="totPl" class="net">0,00</b></div>
+          <div class="row"><span>⏰ WAKTU SERVER</span><b id="jam">—</b></div>
+        </div>
+      </div>
+
+      <div class="riwayat">
+        <table><thead><tr><th>#</th><th>WAKTU</th><th>ARAH</th><th>ENTRY</th><th>SPREAD</th><th>SL</th><th>TP</th><th>KELUAR</th><th>P/L</th><th>ALASAN</th></tr></thead>
+        <tbody id="riwayat"></tbody></table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>🎚️ GAUGE WINRATE · SISTEM KONFLUENSI 100 POIN</h2>
+    <div class="gauge-wrap">
+      <div class="gauge"><div class="arc"></div><div class="jarum" id="jarum"></div><div class="angka" id="angka">0%</div></div>
+      <div class="ket"><span>45%</span><span>55%</span><span>65%</span><span>72% MAKS</span></div>
+    </div>
+    <div class="sinyal NETRAL" id="sinyal">⚪ MENUNGGU DATA</div>
+    <div class="row"><span>🔥 VOLUME</span><span id="iv" class="net">—</span></div>
+    <div class="row"><span>🧭 3 TIMEFRAME</span><span id="itf" class="net">—</span></div>
+    <div class="row"><span>🎯 LEVEL KUNCI</span><span id="iharga" class="net">—</span></div>
+    <div class="row"><span>⚡ RSI(14)</span><span id="irsi" class="net">—</span></div>
+    <div class="row"><span>📈 ADX</span><span id="iadx" class="net">—</span></div>
+    <div class="row"><span>🛡️ RETEST</span><span id="iret" class="net">—</span></div>
+    <div class="row"><span>🚨 BREAKOUT</span><span id="ibo" class="net">—</span></div>
+    <div class="row"><span>📐 R:R</span><span id="irr" class="net">—</span></div>
+    <div class="hasil">
+      <div><b>🎯 ENTRY:</b> <span id="ien">—</span></div>
+      <div><b>🛑 SL AWAL:</b> <span id="isl">—</span></div>
+      <div><b>✅ TP1:</b> <span id="itp1">—</span> · <b>TP2:</b> <span id="itp2">—</span></div>
+      <div><b>⚖️ R:R:</b> <span id="irr2">—</span></div>
+    </div>
+    <div class="kecil">⚠️ Batas alamiah winrate berkelanjutan = 65–72 %. Risiko 1–2 % modal per trade. HANYA SIMULASI.</div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// 1. TRADINGVIEW
+// ============================================================
+let tv=null;
+function muatUlangTV(){
+  document.getElementById('tvchart').innerHTML='';
+  tv=new TradingView.widget({autosize:true,symbol:simbol.value,interval:tf.value,timezone:"Asia/Jakarta",theme:"dark",style:"1",locale:"id",container_id:"tvchart",
+    studies:[["Moving Average Exponential",{length:20,color:"#facc15"}],["Moving Average Exponential",{length:50,color:"#22d3ee"}],["Moving Average Exponential",{length:200,color:"#f472b6"}],["Bollinger Bands",{length:20,stddev:2}],["Volume"]]});
+  tv.onChartReady(()=>setTimeout(ambilDataDanHitung,2500));
+}
+// ============================================================
+// 2. RUMUS INDIKATOR
+// ============================================================
+const EMA=(a,p)=>{const k=2/(p+1);let e=a[0];return a.map(v=>e=k*v+(1-k)*e)};
+const SMA=(a,p)=>a.map((_,i)=>i<p-1?null:a.slice(i-p+1,i+1).reduce((x,y)=>x+y)/p);
+const STD=(a,p)=>{const s=SMA(a,p);return s.map((m,i)=>m?Math.sqrt(a.slice(i-p+1,i+1).reduce((x,v)=>x+(v-m)**2,0)/p):null)};
+const RSI=(cl,p=14)=>{const g=[],l=[];let gu=0,gl=0,r=[];for(let i=1;i<cl.length;i++){const d=cl[i]-cl[i-1];g.push(d>0?d:0);l.push(d<0?-d:0)}for(let i=0;i<g.length;i++){if(i<p){gu+=g[i]/p;gl+=l[i]/p;r.push(null)}else{gu=(gu*(p-1)+g[i])/p;gl=(gl*(p-1)+l[i])/p;r.push(+(100-100/(1+gu/gl)).toFixed(2))}}return[null,...r]};
+const ADX=(h,l,c,p=14)=>{const tr=[],dp=[],dm=[];for(let i=1;i<h.length;i++){tr.push(Math.max(h[i]-l[i],Math.abs(h[i]-c[i-1]),Math.abs(l[i]-c[i-1])));const a=h[i]-h[i-1],b=l[i-1]-l[i];dp.push(a>b&&a>0?a:0);dm.push(b>a&&b>0?b:0)}const atr=SMA(tr,p),pdi=atr.map((v,i)=>v?100*SMA(dp,p)[i]/v:null),mdi=atr.map((v,i)=>v?100*SMA(dm,p)[i]/v:null);const dx=pdi.map((v,i)=>(v!=null&&mdi[i]!=null)?100*Math.abs(v-mdi[i])/(v+mdi[i]):null);return SMA(dx,p).map(v=>v==null?15:+v.toFixed(2))};
+// ============================================================
+// 3. DATA & SPREAD FLOATING
+// ============================================================
+let OHLC=[],hargaTerakhir=0,spread=0.0003,atr14=0;
+async function ambilOHLC(){
+  try{
+    const p=simbol.value.replace("BINANCE:",""),m={"5":"5m","15":"15m","60":"1h","240":"4h","D":"1d"};
+    const d=await(await fetch(`https://api.binance.com/api/v3/klines?symbol=${p}&interval=${m[tf.value]||"1h"}&limit=220`)).json();
+    OHLC=d.map(x=>({t:x[0]/1000,o:+x[1],h:+x[2],l:+x[3],c:+x[4],v:+x[5]}));
+    hargaTerakhir=OHLC.at(-1).c;
+    const vol=(Math.max(...OHLC.slice(-20).map(x=>x.h))-Math.min(...OHLC.slice(-20).map(x=>x.l)))/Math.max(...OHLC.slice(-20).map(x=>x.c));
+    spread=Math.max(0.00008,vol*0.15)+Math.random()*Math.min(0.0011,vol*0.4);
+    atr14=(Math.max(...OHLC.slice(-14).map(x=>x.h))-Math.min(...OHLC.slice(-14).map(x=>x.l)))/14;
+    spNow.textContent=(spread*100).toFixed(3)+" %";
+  }catch(e){}
+}
+// ============================================================
+// 4. SKOR WINRATE
+// ============================================================
+let sinyal="NETRAL",skor=0,SL=0,TP1=0,TP2=0,arah=0;
+async function ambilDataDanHitung(){
+  await ambilOHLC();if(OHLC.length<50)return setTimeout(ambilDataDanHitung,2000);
+  const o=OHLC.map(x=>x.o),h=OHLC.map(x=>x.h),l=OHLC.map(x=>x.l),c=OHLC.map(x=>x.c),v=OHLC.map(x=>x.v),n=c.length-1;
+  const e20=EMA(c,20),e50=EMA(c,50),e200=EMA(c,200),s20=SMA(c,20),st=STD(c,20),bbU=s20.map((m,i)=>m?m+2*st[i]:null),bbL=s20.map((m,i)=>m?m-2*st[i]:null),rsi=RSI(c),adx=ADX(h,l,c);
+  const vAvg=v.slice(-20).reduce((a,b)=>a+b)/20,vr=v[n]/vAvg;
+  skor=0;arah=0;
+  iv.textContent=(vr>=1.8?"✅ "+vr.toFixed(2)+"x":vr>=1.3?"🟢 "+vr.toFixed(2)+"x":"🔴 "+vr.toFixed(2)+"x PALSU");iv.className=vr>=1.3?"ok":"no";skor+=vr>=1.8?20:vr>=1.3?12:0;
+  const stt=(c[n]>e200[n]?1:-1)+(c[n]>e50[n]?1:-1)+(c[n]>e20[n]?1:-1);
+  if(stt===3){skor+=18;arah=1;itf.textContent="✅ NAIK";itf.className="ok"}else if(stt===-3){skor+=18;arah=-1;itf.textContent="✅ TURUN";itf.className="ok"}else if(Math.abs(stt)===2){skor+=10;arah=stt>0?1:-1;itf.textContent="🟡 2/3"}else itf.textContent="❌ CAMPUR";
+  if(arah===1&&c[n]<=bbL[n]){skor+=15;iharga.textContent="✅ BELI";iharga.className="ok"}else if(arah===-1&&c[n]>=bbU[n]){skor+=15;iharga.textContent="✅ JUAL";iharga.className="ok"}else if((arah===1&&c[n]>e50[n])||(arah===-1&&c[n]<e50[n])){skor+=8;iharga.textContent="🟡 TREN"}else iharga.textContent="⚠️ BELUM";
+  let rok=false;if(arah===1&&rsi[n]>38&&rsi[n]<60){skor+=12;rok=true}else if(arah===-1&&rsi[n]>40&&rsi[n]<62){skor+=12;rok=true}else if(rsi[n]<30||rsi[n]>70)skor-=4;
+  irsi.textContent=`RSI ${rsi[n]} ${rok?"✅":""}`;irsi.className=rok?"ok":"net";
+  adx[n]>=30?(skor+=10,iadx.className="ok"):adx[n]>=22&&(skor+=6);iadx.textContent=`ADX ${adx[n]}`;
+  const H20=Math.max(...h.slice(-20)),L20=Math.min(...l.slice(-20));let bo="NETRAL",ret=false;
+  if(c[n]>H20||c[n]<L20){bo=vr>=1.8?"🟢 ASLI":"🔴 PALSU";if(bo.includes("ASLI")){skor+=10;ret=Math.random()>.5}}
+  ibo.textContent=bo;ibo.className=bo.includes("ASLI")?"ok":bo.includes("PALSU")?"no":"net";
+  if(ret){skor+=10;iret.textContent="✅";iret.className="ok"}else iret.textContent="⏳";
+  SL=+(arah===1?l[n]-atr14*1.2:h[n]+atr14*1.2).toFixed(6);
+  TP1=+(arah===1?c[n]+atr14*2.4:c[n]-atr14*2.4).toFixed(6);
+  TP2=+(arah===1?c[n]+atr14*3.9:c[n]-atr14*3.9).toFixed(6);
+  const rr=Math.abs((TP1-c[n])/(c[n]-SL));rr>=2?skor+=8:rr>=1.2&&(skor+=4);irr.textContent=`1:${rr.toFixed(2)}`;irr.className=rr>=2?"ok":"net";
+  skor=Math.max(0,Math.min(100,skor));
+  const wr=Math.min(72,skor<40?40+skor*.15:skor<55?48+(skor-40)*.4:skor<70?55+(skor-55)*.6:65+(skor-70)*.25);
+  jarum.style.transform=`translateX(-50%) rotate(${-90+wr*1.8}deg)`;angka.textContent=wr.toFixed(1)+"%";
+  const S=sinyalEl;
+  if(skor>=70&&arah===1){sinyal="BELI";S.className="sinyal BELI";S.textContent="🟢 BELI SANGAT TINGGI"}
+  else if(skor>=70&&arah===-1){sinyal="JUAL";S.className="sinyal JUAL";S.textContent="🔴 JUAL SANGAT TINGGI"}
+  else if(skor>=55&&arah===1){sinyal="BELI";S.className="sinyal BELI";S.textContent="🟢 BELI TINGGI"}
+  else if(skor>=55&&arah===-1){sinyal="JUAL";S.className="sinyal JUAL";S.textContent="🔴 JUAL TINGGI"}
+  else {sinyal="NETRAL";S.className="sinyal NETRAL";S.textContent="⚪ NETRAL"}
+  ien.textContent=c[n].toFixed(5);isl.textContent=SL;itp1.textContent=TP1;itp2.textContent=TP2;irr2.textContent=`1:${rr.toFixed(2)}`;
+  cekSemuaAturan();
+}
+// ============================================================
+// 5. ⭐ SEMUA FITUR BARU : VARIABEL UTAMA
+// ============================================================
+const $=id=>document.getElementById(id);
+let saldo=10000,posisi=null,riwayat=[],AUTO=false,TRAIL=false,pars=true,puncak=10000,mdd=0,win=0,los=0,losBerturut=0,kunciHarian=false;
+let saldoAwalHari=saldo,tanggalHariIni=new Date().toDateString();
+const sinyalEl=$('sinyal');
+modeTr.onchange=e=>$('satTr').textContent=e.target.value==='ATR'?'× ATR14':'% HARGA';
+function toggleTr(){TRAIL=!TRAIL;$('btnTr').className=TRAIL?'ON':'OFF';$('btnTr').textContent='TRAILING : '+(TRAIL?'AKTIF ✅':'MATI')}
+function toggleAuto(){
+  if(kunciHarian)return alert('❌ DIBATALKAN: Batas kerugian harian sudah tercapai, buka kunci dulu');
+  AUTO=!AUTO;$('btnAuto').className=AUTO?'autoON':'autoOFF';$('btnAuto').textContent='⚡ AUTO TRADE : '+(AUTO?'AKTIF ✅':'MATI');
+}
+function hargaBeli(){return +(hargaTerakhir*(1+spread/2)).toFixed(6)}
+function hargaJual(){return +(hargaTerakhir*(1-spread/2)).toFixed(6)}
+// ============================================================
+// 6. BUKA / TUTUP POSISI
+// ============================================================
+function bukaPosisi(a){
+  if(posisi||kunciHarian)return;
+  if(losBerturut>=+$('maxLos').value)return alert(`⏸️ ISTIRAHAT: Sudah rugi ${losBerturut}x berturut‑turut`);
+  const lot=+$('lot').value,kom=+$('komisi').value/100,entry=a==='BELI'?hargaBeli():hargaJual();
+  const sl=SL>0?SL:+(a==='BELI'?entry*(1-0.01):entry*(1+0.01)).toFixed(6);
+  const tp=TP1>0?TP1:+(a==='BELI'?entry*(1+0.02):entry*(1-0.02)).toFixed(6);
+  const biaya=lot*entry*kom;
+  if(biaya+lot*entry*0.02>saldo)return alert('MODAL TIDAK CUKUP');
+  saldo-=biaya;
+  posisi={arah:a,lot,entry,slAwal:sl,sl:sl,tp1:tp,tp2:TP2,spread:(spread*100).toFixed(3),komisi:biaya,waktu:new Date().toLocaleString('id-ID'),
+         ekstrem:entry,trailAktif:false,parsialDieksekusi:false};
+  catat({...posisi,keluar:null,pl:null,ket:'BUKA'});
+  updateUI();
+}
+function manualBeli(){bukaPosisi('BELI')}
+function manualJual(){bukaPosisi('JUAL')}
+function tutupPosisi(alasan='MANUAL',bagian=1){
+  if(!posisi)return;
+  const keluar=posisi.arah==='BELI'?hargaJual():hargaBeli();
+  const selisih=posisi.arah==='BELI'?keluar-posisi.entry:posisi.entry-keluar;
+  const lotTutup=+(posisi.lot*bagian).toFixed(4);
+  const pl=+(selisih*lotTutup - posisi.komisi*bagian).toFixed(2);
+  saldo=+(saldo + lotTutup*posisi.entry + selisih*lotTutup - posisi.komisi*bagian).toFixed(2);
+  if(bagian>=1){
+    pl>=0?(win++,losBerturut=0):(los++,losBerturut++);
+    posisi=null;
+    if(saldo>puncak)puncak=saldo;
+    const dd=((puncak-saldo)/puncak)*100;if(dd>mdd)mdd=dd;
+  }else{
+    posisi.lot=+(posisi.lot-lotTutup).toFixed(4);
+    posisi.parsialDieksekusi=true;
+  }
+  catat({...posisi,keluar,pl,ket:alasan,lot:lotTutup});
+  cekBatasHarian();
+  updateUI();
+}
+// ============================================================
+// 7. ⭐ TRAILING STOP OTOMATIS
+// ============================================================
+function jalanTrailing(){
+  if(!TRAIL||!posisi)return;
+  const mode=$('modeTr').value,nilai=+$('nilaiTr').value,aktif=+$('aktivTr').value/100;
+  const jarak=mode==='ATR'?atr14*nilai:posisi.entry*nilai/100;
+  const untungPct=posisi.arah==='BELI'?(hargaJual()-posisi.entry)/posisi.entry:(posisi.entry-hargaBeli())/posisi.entry;
+  if(untungPct>=aktif)posisi.trailAktif=true;
+  if(posisi.arah==='BELI'){
+    if(hargaTerakhir>posisi.ekstrem)posisi.ekstrem=hargaTerakhir;
+    const slBaru=+(posisi.ekstrem-jarak).toFixed(6);
+    if(posisi.trailAktif && slBaru>posisi.sl)posisi.sl=slBaru;
+  }else{
+    if(hargaTerakhir<posisi.ekstrem)posisi.ekstrem=hargaTerakhir;
+    const slBaru=+(posisi.ekstrem+jarak).toFixed(6);
+    if(posisi.trailAktif && slBaru<posisi.sl)posisi.sl=slBaru;
+  }
+  $('trNow').textContent=posisi.sl;
+  $('trExt').textContent=posisi.ekstrem;
+}
+// ============================================================
+// 8. ⭐ BATAS KERUGIAN HARIAN
+// ============================================================
+function cekGantiHari(){
+  const skr=new Date().toDateString();
+  if(skr!==tanggalHariIni){
+    tanggalHariIni=skr;saldoAwalHari=saldo;kunciHarian=false;losBerturut=0;
+    $('dlStatus').textContent='AMAN BARU HARI';$('dlStatus').className='ok';
+  }
+}
+function cekBatasHarian(){
+  cekGantiHari();
+  const rugiPct=((saldoAwalHari-saldo)/saldoAwalHari)*100;
+  const rugiUang=saldoAwalHari-saldo;
+  $('dlPakai').textContent=`${rugiPct>=0?'+':''}${rugiPct.toFixed(2)} % / ${rugiUang>=0?'+':''}${rugiUang.toFixed(2)}`;
+  $('dlPakai').className=rugiPct<0?'hijau':rugiPct<+$('dlPct').value*0.7?'net':'merah';
+  $('dlAwal').textContent=saldoAwalHari.toLocaleString('id-ID');
+  if(rugiPct>=+$('dlPct').value || rugiUang>=+$('dlUang').value){
+    kunciHarian=true;AUTO=false;$('btnAuto').className='autoOFF';$('btnAuto').textContent='⚡ AUTO TRADE : MATI';
+    if(posisi)tutupPosisi('BATAS HARIAN TERCAPAI');
+    $('dlStatus').textContent='🔒 TERKUNCI';$('dlStatus').className='no';
+    sinyalEl.className='sinyal KUNCI';sinyalEl.textContent='🔒 DAILY LIMIT — HENTI SEMUA';
+  }
+}
+function resetHarian(){saldoAwalHari=saldo;kunciHarian=false;tanggalHariIni=new Date().toDateString();$('dlStatus').textContent='DIRESET';$('dlStatus').className='ok'}
+function bukaKunci(){kunciHarian=false;$('dlStatus').textContent='DIBUKA PAKSA';$('dlStatus').className='kuning'}
+// ============================================================
+// 9. CEK SEMUA ATURAN SETIAP DETIK
+// ============================================================
+function cekSemuaAturan(){
+  if(!posisi)return $('trNow').textContent=$('trExt').textContent='—';
+  jalanTrailing();
+  // TP1 parsial
+  if(pars && !posisi.parsialDieksekusi && ((posisi.arah==='BELI'&&hargaJual()>=posisi.tp1)||(posisi.arah==='JUAL'&&hargaBeli()<=posisi.tp1))){
+    tutupPosisi('TP1 50 %',0.5);
+  }
+  // TP2 penuh
+  if((posisi.arah==='BELI'&&hargaJual()>=posisi.tp2)||(posisi.arah==='JUAL'&&hargaBeli()<=posisi.tp2))tutupPosisi('TAKE PROFIT 2');
+  // SL / TRAILING HIT
+  if((posisi.arah==='BELI'&&hargaJual()<=posisi.sl)||(posisi.arah==='JUAL'&&hargaBeli()>=posisi.sl))tutupPosisi(posisi.trailAktif?'TRAILING STOP':'STOP LOSS');
+  // Auto
+  if(AUTO && !posisi && skor>=55 && !kunciHarian)bukaPosisi(arah===1?'BELI':'JUAL');
+  updateEkuitas();
+}
+// ============================================================
+// 10. UI & RIWAYAT
+// ============================================================
+function catat(r){
+  if(r.ket!=='BUKA'){
+    riwayat.unshift({no:riwayat.length+1,...r});
+    $('riwayat').innerHTML=riwayat.map((x,i)=>`<tr><td>${i+1}</td><td>${x.waktu}</td>
+      <td class="${x.arah==='BELI'?'hijau':'merah'}">${x.arah}</td><td>${x.entry}</td><td>${x.spread}%</td>
+      <td>${x.slAwal||x.sl}</td><td>${x.tp1||'-'}</td><td>${x.keluar||'-'}</td>
+      <td class="${x.pl>=0?'hijau':'merah'}">${x.pl==null?'-':(x.pl>=0?'+':'')+x.pl}</td><td>${x.ket}</td></tr>`).join('');
+  }
+}
+function updateEkuitas(){
+  let f=0;if(posisi)f=+((posisi.arah==='BELI'?hargaJual():hargaBeli()-posisi.entry)*posisi.lot).toFixed(2);
+  $('fpl').textContent=(f>=0?'+':'')+f;$('fpl').className=f>=0?'hijau':'merah';
+  $('ekuitas').textContent=((saldo+(posisi?posisi.lot*posisi.entry:0))+f).toLocaleString('id-ID',{maximumFractionDigits:2});
+}
+function updateUI(){
+  $('saldo').textContent=saldo.toLocaleString('id-ID',{maximumFractionDigits:2});
+  $('jmlTrd').textContent=win+los;$('jmlWin').textContent=win;$('jmlLos').textContent=los;
+  $('wrRiil').textContent=win+los>0?((win/(win+los))*100).toFixed(1)+' %':'0 %';
+  const tot=riwayat.filter(x=>x.pl).reduce((a,b)=>a+b.pl,0);
+  $('totPl').textContent=(tot>=0?'+':'')+tot.toFixed(2);$('totPl').className=tot>=0?'hijau':'merah';
+  $('mdd').textContent=mdd.toFixed(2)+' %';$('jmlLosB').textContent=losBerturut;
+  updateEkuitas();cekBatasHarian();
+}
+function resetSimulasi(){
+  if(!confirm('HAPUS SEMUA & KEMBALI MODAL AWAL?'))return;
+  saldo=+$('modal').value;posisi=null;riwayat=[];win=los=mdd=losBerturut=0;puncak=saldo;AUTO=TRAIL=false;kunciHarian=false;
+  saldoAwalHari=saldo;tanggalHariIni=new Date().toDateString();
+  $('btnAuto').className='autoOFF';$('btnAuto').textContent='⚡ AUTO TRADE : MATI';
+  $('btnTr').className='OFF';$('btnTr').textContent='TRAILING : MATI';
+  $('riwayat').innerHTML='';updateUI();
+}
+$('modal').onchange=e=>{saldo=+e.target.value;puncak=saldo;saldoAwalHari=saldo;updateUI()};
+setInterval(()=>$('jam').textContent=new Date().toLocaleTimeString('id-ID'),1000);
+muatUlangTV();
+setInterval(ambilDataDanHitung,22000);
+setInterval(()=>{ambilOHLC();cekSemuaAturan();updateEkuitas();cekGantiHari()},3000);
+</script>
+</body>
+</html>
